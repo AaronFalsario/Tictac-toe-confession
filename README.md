@@ -19,7 +19,7 @@ The music file is loaded from:
 public/music/song.mp3
 ```
 
-The envelope click starts playback immediately (and is the only event that starts the song). Browsers may block playback; if playback fails, an **Add song to play** fallback and music toggle are provided. Music loops and can be paused with the reveal-page music control. The MP3 is user-provided and is not included in the source project.
+The envelope click starts playback immediately (and is the only event that starts the song). Browsers may block playback; if playback fails, an **Add song to play** fallback and music toggle are provided. Music loops and can be paused with the reveal-page music control. Ensure you have permission to use and distribute the audio file before publishing.
 
 ## How to personalize
 
@@ -31,13 +31,33 @@ The envelope click starts playback immediately (and is the only event that start
 
 The early screens intentionally use only a restrained navy, slate, teal, and amber game palette. The personal reveal is kept in the final room.
 
-## Deploy
+## Deploy to Vercel
 
-Opening the envelope starts the optional music and plays a short full-screen floral transition into the pink letter page. The letter types out character by character in Cormorant Garamond, with a reading-progress bar and a skip-animation option. Music can be toggled from the reveal onward; it only starts after the envelope is opened.
+The project is configured for Vercel in `vercel.json`. Vercel will run the Vite production build, publish `dist`, and route app paths to the React entry point.
 
-This is a static Vite app and can be deployed to Vercel or Netlify. Connect the repository and use:
+### Deploy with the Vercel dashboard
 
-- Build command: `npm run build`
-- Output directory: `dist`
+1. Push the project to a GitHub, GitLab, or Bitbucket repository. Include `package.json`, `package-lock.json`, `vercel.json`, `src/`, `public/`, and `index.html`. Do not commit `node_modules/` or `dist/`; `.gitignore` excludes them.
+2. In Vercel, select **Add New → Project** and import the repository.
+3. Keep the detected Vite settings, or verify:
+   - Framework preset: **Vite**
+   - Build command: `npm run build`
+   - Output directory: `dist`
+   - Install command: `npm install`
+4. Select **Deploy**. No environment variables are required.
 
-Upload your own licensed MP3 to `public/music/` before deploying if you want the optional background music.
+### Deploy with the Vercel CLI
+
+From the project directory, run:
+
+```bash
+npm install
+npm run build
+npx vercel
+```
+
+For a production deployment, run `npx vercel --prod`.
+
+The optional music asset is expected at `public/music/song.mp3` and is copied to `/music/song.mp3` in the build.
+
+Netlify is also supported as a static Vite site with build command `npm run build` and publish directory `dist`.
