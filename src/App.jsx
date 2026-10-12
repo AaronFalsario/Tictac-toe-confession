@@ -29,11 +29,11 @@ export default function App() {
       {!isPersonalReveal && <div aria-hidden="true" className="pointer-events-none absolute inset-0 game-grid opacity-60" />}
       {!isPersonalReveal && <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(20,184,166,0.08),transparent_58%)]" />}
 
-      {(screen === 'envelope' || screen === 'reveal' || screen === 'yes') && (
+      {(screen === 'reveal' || screen === 'yes') && (
         <div className="fixed right-4 top-4 z-50 flex items-center gap-2">
           {!musicAvailable && screen !== 'yes' && (
-            <button onClick={() => music.play().then(setMusicAvailable)} className="rounded-lg border border-slate-700 bg-slate-900/90 px-3 py-2 font-mono text-xs text-slate-200 hover:border-teal-500">
-              Play music
+            <button onClick={() => music.play().then(setMusicAvailable)} className="rounded-full border border-rose-300 bg-white/90 px-4 py-3 font-mono text-[10px] uppercase tracking-wider text-rose-700 shadow-lg hover:bg-white">
+              Add song to play
             </button>
           )}
           <MusicToggle isPlaying={music.isPlaying} onToggle={music.toggle} />

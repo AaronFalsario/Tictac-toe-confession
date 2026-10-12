@@ -23,22 +23,39 @@ const flowerPositions = [
 ]
 
 export default function RevealScreen({ onYes }) {
-  const [visibleLines, setVisibleLines] = useState(0)
+  const [activeParagraph, setActiveParagraph] = useState(0)
+  const [characterCount, setCharacterCount] = useState(0)
+  const [completedParagraphs, setCompletedParagraphs] = useState(0)
+  const [skipTyping, setSkipTyping] = useState(false)
   const [hoverCount, setHoverCount] = useState(0)
   const [thinkingLabel, setThinkingLabel] = useState('Let me think')
   const [response, setResponse] = useState('')
   const [accepted, setAccepted] = useState(false)
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setVisibleLines(1), 550)
+    if (skipTyping || activeParagraph >= letterParagraphs.length) return undefined
+    const currentText = letterParagraphs[activeParagraph].text
+    const isParagraphComplete = characterCount >= currentText.length
+    const lastTypedCharacter = currentText[characterCount - 1]
+    const characterDelay = lastTypedCharacter === ' '
+      ? 72
+      : /[.!?—]/.test(lastTypedCharacter || '')
+        ? 360
+        : /[,;:]/.test(lastTypedCharacter || '')
+          ? 230
+          : 55
+    const delay = isParagraphComplete ? 1050 : characterCount === 0 ? 650 : characterDelay
+    const timer = window.setTimeout(() => {
+      if (isParagraphComplete) {
+        setCompletedParagraphs(activeParagraph + 1)
+        setActiveParagraph((index) => index + 1)
+        setCharacterCount(0)
+      } else {
+        setCharacterCount((count) => count + 1)
+      }
+    }, delay)
     return () => window.clearTimeout(timer)
-  }, [])
-
-  useEffect(() => {
-    if (visibleLines === 0 || visibleLines >= letterParagraphs.length) return undefined
-    const timer = window.setTimeout(() => setVisibleLines((count) => Math.min(count + 1, letterParagraphs.length)), 1450)
-    return () => window.clearTimeout(timer)
-  }, [visibleLines])
+  }, [activeParagraph, characterCount, skipTyping])
 
   function handleThinkingHover() {
     if (hoverCount >= 3) return
@@ -53,7 +70,19 @@ export default function RevealScreen({ onYes }) {
     setResponse('Of course. There is no rush—take whatever time feels right for you.')
   }
 
-  const progress = Math.round((visibleLines / letterParagraphs.length) * 100)
+  const totalCharacters = letterParagraphs.reduce((total, paragraph) => total + paragraph.text.length, 0)
+  const typedCharacters = skipTyping
+    ? totalCharacters
+    : letterParagraphs.slice(0, completedParagraphs).reduce((total, paragraph) => total + paragraph.text.length, 0) + characterCount
+  const progress = Math.round((typedCharacters / totalCharacters) * 100)
+  const isLetterComplete = completedParagraphs === letterParagraphs.length || skipTyping
+
+  function skipLetterTyping() {
+    setSkipTyping(true)
+    setCompletedParagraphs(letterParagraphs.length)
+    setActiveParagraph(letterParagraphs.length)
+    setCharacterCount(0)
+  }
 
   return (
     <section className="relative mx-auto w-full max-w-3xl py-5 sm:py-10">
@@ -94,7 +123,7 @@ export default function RevealScreen({ onYes }) {
           <div className="flex items-center justify-between gap-4 border-b border-rose-200/80 pb-5">
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-rose-500">A letter, just for you</p>
-              <h1 className="mt-2 font-serif text-2xl font-semibold text-[#684456] sm:text-3xl">A little something from me</h1>
+              <h1 className="mt-2 font-letter text-3xl font-semibold text-[#684456] sm:text-4xl">A little something from me</h1>
             </div>
             <Flower size={42} color="#e29aae" />
           </div>
@@ -106,40 +135,55 @@ export default function RevealScreen({ onYes }) {
             <span className="font-mono text-[10px] text-rose-400">{progress}%</span>
           </div>
 
-          {visibleLines < letterParagraphs.length && (
+          {!isLetterComplete && (
             <button
               type="button"
-              onClick={() => setVisibleLines(letterParagraphs.length)}
+              onClick={skipLetterTyping}
               className="mt-4 rounded-md px-2 py-1 font-mono text-[10px] text-rose-500 underline decoration-rose-200 underline-offset-4 transition hover:text-rose-700"
             >
               Skip the writing animation
             </button>
           )}
 
-          <div className="relative mt-6 space-y-4 font-serif text-[16px] leading-[1.85] text-[#594650] sm:text-[17px]">
-            {letterParagraphs.slice(0, visibleLines).map((paragraph, index) => (
+          <div className="relative mt-6 space-y-4 font-letter text-[18px] leading-[1.85] text-[#594650] sm:text-[19px]">
+            {letterParagraphs.slice(0, completedParagraphs).map((paragraph) => (
               <motion.p
                 key={paragraph.text}
-                initial={{ opacity: 0, y: 10, filter: 'blur(3px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                transition={{ duration: 0.65 }}
                 className={
                   paragraph.kind === 'salutation'
-                    ? 'text-xl font-semibold text-[#684456]'
+                    ? 'text-2xl font-semibold text-[#684456]'
                     : paragraph.kind === 'question'
-                      ? 'pt-2 text-center text-2xl font-semibold text-rose-600 sm:text-3xl'
+                      ? 'pt-2 text-center text-3xl font-semibold text-rose-600 sm:text-4xl'
                       : paragraph.kind === 'signature'
-                        ? 'pt-1 text-right text-base italic text-[#9b6176]'
+                        ? 'pt-1 text-right text-xl italic text-[#9b6176]'
                         : ''
                 }
               >
                 {paragraph.text}
-                {index === visibleLines - 1 && visibleLines < letterParagraphs.length && <span className="ml-1 inline-block h-4 w-0.5 animate-pulse bg-rose-400 align-middle" />}
               </motion.p>
             ))}
+            {!isLetterComplete && activeParagraph < letterParagraphs.length && (
+              <motion.p
+                key={`typing-${activeParagraph}`}
+                initial={{ opacity: 0.75 }}
+                animate={{ opacity: 1 }}
+                className={
+                  letterParagraphs[activeParagraph].kind === 'salutation'
+                    ? 'text-2xl font-semibold text-[#684456]'
+                    : letterParagraphs[activeParagraph].kind === 'question'
+                      ? 'pt-2 text-center text-3xl font-semibold text-rose-600 sm:text-4xl'
+                      : letterParagraphs[activeParagraph].kind === 'signature'
+                        ? 'pt-1 text-right text-xl italic text-[#9b6176]'
+                        : ''
+                }
+              >
+                {letterParagraphs[activeParagraph].text.slice(0, characterCount)}
+                <span aria-hidden="true" className="ml-0.5 inline-block h-5 w-px animate-pulse bg-rose-500 align-middle" />
+              </motion.p>
+            )}
           </div>
 
-          {visibleLines >= letterParagraphs.length && !accepted && (
+          {isLetterComplete && !accepted && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-8 border-t border-rose-100 pt-6 text-center">
               <div className="flex flex-wrap justify-center gap-3">
                 <button

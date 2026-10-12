@@ -19,7 +19,7 @@ export default function EnvelopeScreen({ onOpenMusic, onReveal }) {
     if (isOpen) return
     setIsOpen(true)
     onOpenMusic()
-    window.setTimeout(onReveal, 1550)
+    window.setTimeout(onReveal, 2050)
   }
 
   return (
@@ -51,23 +51,23 @@ export default function EnvelopeScreen({ onOpenMusic, onReveal }) {
             aria-hidden="true"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.45 }}
+            exit={{ opacity: 0, transition: { duration: 0.8, ease: 'easeInOut' } }}
+            transition={{ duration: 0.3 }}
             className="fixed inset-0 z-[60] grid place-items-center overflow-hidden bg-[#fce7ef]"
           >
             <motion.div
-              initial={{ scale: 0.15, rotate: -12 }}
-              animate={{ scale: 1.8, rotate: 0 }}
-              transition={{ duration: 1.15, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#fff7f8_0%,#fbcfe0_52%,#f9a8c5_100%)]"
+              initial={{ scale: 0.03, opacity: 0.3, x: '-50%', y: '-50%' }}
+              animate={{ scale: 1, opacity: 1, x: '-50%', y: '-50%' }}
+              transition={{ duration: 1.25, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute left-1/2 top-1/2 h-[160vmax] w-[160vmax] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,#fff7f8_0%,#fbcfe0_52%,#f9a8c5_100%)]"
             />
 
             {bloomFlowers.map((flower) => (
               <motion.div
                 key={flower.key}
-                initial={{ opacity: 0, scale: 0.2, rotate: -30 }}
-                animate={{ opacity: 0.72, scale: 1, rotate: flower.rotate }}
-                transition={{ delay: flower.delay, duration: 0.8, ease: 'backOut' }}
+                initial={{ opacity: 0, scale: 0.12, rotate: flower.rotate - 65, y: 70 }}
+                animate={{ opacity: 0.72, scale: 1, rotate: flower.rotate, y: 0 }}
+                transition={{ delay: flower.delay + 0.15, duration: 1.05, ease: [0.16, 1, 0.3, 1] }}
                 className="absolute"
                 style={{ left: flower.left, top: flower.top }}
               >
@@ -76,17 +76,20 @@ export default function EnvelopeScreen({ onOpenMusic, onReveal }) {
             ))}
 
             <motion.div
-              initial={{ y: 24, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.55 }}
-              className="relative z-10 grid h-28 w-20 place-items-center rounded-lg border border-white/80 bg-[#fffaf7] shadow-[0_16px_50px_rgba(120,40,70,0.2)]"
+              initial={{ y: 50, opacity: 0, scale: 0.35, rotate: 8 }}
+              animate={{ y: 0, opacity: 1, scale: [0.35, 1.06, 1], rotate: 0 }}
+              transition={{ delay: 0.45, duration: 1.25, ease: [0.16, 1, 0.3, 1] }}
+              className="relative z-10 grid h-32 w-24 place-items-center rounded-lg border border-white/90 bg-[#fffaf7] shadow-[0_24px_80px_rgba(120,40,70,0.24)]"
             >
-              <div className="absolute inset-x-2 top-5 space-y-2">
-                <span className="block h-px bg-rose-200" />
-                <span className="block h-px bg-rose-200" />
-                <span className="block h-px w-4/5 bg-rose-200" />
+              <div className="absolute inset-x-3 top-5 space-y-3">
+                <span className="block h-px bg-rose-200/90" />
+                <span className="block h-px bg-rose-200/90" />
+                <span className="block h-px w-4/5 bg-rose-200/90" />
+                <span className="block h-px w-3/5 bg-rose-200/90" />
               </div>
-              <Flower size={27} color="#d97790" />
+              <motion.div animate={{ rotate: [0, 7, -6, 0] }} transition={{ delay: 0.8, duration: 2.5, ease: 'easeInOut' }}>
+                <Flower size={32} color="#d97790" />
+              </motion.div>
             </motion.div>
           </motion.div>
         )}

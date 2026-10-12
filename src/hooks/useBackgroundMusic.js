@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-// Add the user-supplied, licensed MP3 at this public path.
-const MUSIC_FILE = '/music/take-a-chance-with-me.mp3'
+// The music file lives in public/music/song.mp3 and is served from the site root.
+const MUSIC_FILE = '/music/song.mp3'
 
 export function useBackgroundMusic() {
   const audioRef = useRef(null)
