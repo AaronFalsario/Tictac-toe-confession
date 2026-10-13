@@ -1,6 +1,6 @@
 # The Locked Room
 
-A small, minimalist puzzle game built with React, Vite, Tailwind CSS, and Framer Motion. The first two rooms play as a straightforward combination puzzle and tic-tac-toe game; the final letter appears only after the player wins.
+A small, minimalist puzzle game built with React, Vite, Tailwind CSS, and Framer Motion. After the combination lock, players work through five games: tic-tac-toe, memory matching, a four-round word scramble with rising difficulty, a symbol-sequence game, and a sliding picture puzzle. Completing the envelope picture unlocks the envelope and final letter.
 
 ## Run locally
 

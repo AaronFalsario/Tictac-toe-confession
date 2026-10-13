@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Icon from '../components/Icon.jsx'
 import { playClick, playLockOpen } from '../utils/sounds.js'
@@ -12,6 +12,7 @@ export default function LockScreen({ onUnlock }) {
   const [feedback, setFeedback] = useState('')
   const [locked, setLocked] = useState(false)
   const [shake, setShake] = useState(false)
+  const inputRef = useRef(null)
 
   useEffect(() => {
     if (!locked) return undefined
@@ -40,6 +41,17 @@ export default function LockScreen({ onUnlock }) {
     window.setTimeout(() => setShake(false), 380)
   }
 
+  function updateEntry(event) {
+    const input = event.currentTarget
+    const digitsBeforeCursor = Math.min(input.value.slice(0, input.selectionStart ?? input.value.length).replace(/\D/g, '').length, 6)
+    const digits = input.value.replace(/\D/g, '').slice(0, 6)
+    const formatted = `${digits.slice(0, 2)}${digits.length >= 2 ? '/' : ''}${digits.slice(2, 4)}${digits.length > 4 ? `/${digits.slice(4)}` : ''}`
+    const cursorPosition = digitsBeforeCursor + Number(digitsBeforeCursor >= 2) + Number(digitsBeforeCursor >= 4)
+
+    setEntry(formatted)
+    window.requestAnimationFrame(() => inputRef.current?.setSelectionRange(cursorPosition, cursorPosition))
+  }
+
   return (
     <section className="panel mx-auto max-w-xl p-6 sm:p-10">
       <div className="mb-8 flex items-center gap-3 border-b border-slate-700/80 pb-5">
@@ -62,12 +74,14 @@ export default function LockScreen({ onUnlock }) {
             {locked ? <Icon name="check" /> : <Icon name="lock" />}
           </div>
           <input
+            ref={inputRef}
+            type="text"
             autoComplete="off"
             aria-label="Combination"
             inputMode="numeric"
-            placeholder="MM / DD / YY"
+            placeholder="MM/DD/YY"
             value={entry}
-            onChange={(event) => setEntry(event.target.value)}
+            onChange={updateEntry}
             disabled={locked}
             className="min-w-0 flex-1 bg-transparent px-1 py-2 text-center font-mono text-lg tracking-[0.12em] text-slate-100 outline-none placeholder:text-sm placeholder:tracking-[0.12em] placeholder:text-slate-600"
           />
